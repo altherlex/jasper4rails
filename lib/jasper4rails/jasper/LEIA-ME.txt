@@ -1,0 +1,15 @@
+COMO INSTALAR O JASPER NO LINUX
+--------------------------------
+
+Pré-requisitos
+
+JasperReport 3.0.0
+iReport 3.0.0
+
+1. Baixe e instale a última versão do Java JRE.
+
+2. Edite o arquivo /etc/bashrc, inserindo o seguinte código:
+------------------------------------------------------------
+export JAVA_HOME=/usr/java/jre1.6.0_06
+export PATH=$JAVA_HOME/bin:$PATH
+------------------------------------------------------------

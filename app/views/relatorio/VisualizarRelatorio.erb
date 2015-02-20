@@ -1,0 +1,14 @@
+<%
+    @vMostrarEstruturaSistema = false
+		vTituloTopo = @appTituloTopo = @vObjRelatorio.dsc_relatorio
+    @vModAtalho = MontarModulo('Atalhos')
+    @appArrModLateral = [@vModAtalho]
+%>
+<div class="conteudo" style="margin-top:0px !important;">
+	<div class="box_2">
+		<div class="titulo"><span class="descricao"><%= vTituloTopo %></span><span class="complemento"></span><div class="botoes"></div></div>
+		<div class="corpo">
+			<iframe src="<%= @vUrlRelatorio %>" width="100%" height="635px" frameborder="0" style="background-color:#FFF;" scrolling="auto" ></iframe>
+		</div>
+	</div>
+</div>

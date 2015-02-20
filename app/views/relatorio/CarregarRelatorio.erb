@@ -1,0 +1,28 @@
+<%
+    @appTitulo = @appTituloTopo = @vObjRelatorio.dsc_relatorio
+    @appImagemTopo = "relatorio32.png"
+    MarcarItemMenuSuperior('Relatórios')
+    @appArrModLateral = [ MontarModulo('Atalhos') ]
+%>
+
+<form id="aFrmCarregarRelatorio" method="post" action="CarregarRelatorio">
+<input type="hidden" id="aHidCdgRelatorio" name="aHidCdgRelatorio" value="<%= @vObjRelatorio.cdg_relatorio %>" />
+<div class="box_2">
+    <div class="titulo"><span class="descricao">Parâmetros do relatório</span><span class="complemento">Outros relatórios: <select id="aCboCdgRelatorio" style="width:200px"><% session[:aLstRelatorio].each do |objRel| %><option value="<%= objRel.cdg_relatorio %>" <%= "selected" if objRel.cdg_relatorio == params[:aHidCdgRelatorio].to_i %> ><%= objRel.dsc_relatorio + " (" + objRel.dsc_tpo_relatorio + ")" %></option><% end %></select></span></span><div class="botoes"><input type="button" id="aBtnVoltar" class="botao" value="Voltar" /></div></div>
+    <div class="corpo">
+        <table class="parametros_filtro">
+                <% @vObjRelatorio.parametros.each do |objParam|
+                    if objParam.parametro_visivel %>
+                    <%= ClsGlbMontarParametroRelatorio.MontarParametros( objParam ) %>
+                <%  end
+                end %>
+            <tr>
+                <td class="campo">Formato</td>
+                <td><span><input type="radio" class="radio" name="aRdBxFormatoExportar" value="pdf" Checked /><img src="http://libweb.youcompany.com/img/exportar_pdf16.gif" alt="PDF" />&nbsp;&nbsp;</span>
+                </td>
+            </tr>
+        </table>
+        <div class="barra_botoes"><input type="button" class="botao" id="aBtnGerarRelatorio" value="Gerar relatório" /></div>
+    </div>
+</div>
+</form>

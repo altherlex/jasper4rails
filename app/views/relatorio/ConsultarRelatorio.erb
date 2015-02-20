@@ -1,0 +1,103 @@
+<style>
+	ul{ list-style: none outside none; }
+</style>
+<%
+	if params[:view]!='arvore'
+		vis = link_to(image_tag('icones/icon-tree22.png', :style=>'margin-left: 11px;', :title=>'Click para mudar a visualização'), '/relatorio/ConsultarRelatorio?view=arvore')
+	else
+		vis = link_to(image_tag('icones/icon-list22.png', :style=>'margin-left: 11px;', :title=>'Click para mudar a visualização'),'/relatorio/ConsultarRelatorio')
+	end
+	@appTituloTopo = "Relatórios"
+	@appImagemTopo = "relatorio32.png"
+	marcar_item_menu_superior(:relatorio)
+	@appPaginaAjuda = '/global/relatoriodinamico/RelatriosDinamicos'
+	@appArrModLateral = [ MontarModulo('Atalhos') ]
+%>
+<form id="aFrmCarregarRelatorio" method="post" action="CarregarRelatorio" >
+<input type="hidden" id="aHidCdgRelatorio" name="aHidCdgRelatorio" />
+<% formulario( :titulo => 'Relatórios'+vis, :classe => 'box_2',
+        :botoes => [{:id => 'btn_novo', :valor => 'Novo relatório', :link => "location.href='#{new_relatorio_path}';", :mostrar=>['CRP','SOC'].include?(CDG_SISTEMA) }],
+        :complemento => "Filtro: #{ select_tag( 'tpo_filtro', options_for_select([['Todos', 'todos'], ['Meu relatórios', 'meus'], ['Fixos', 'fixos'], ['Dinâmicos', 'dinamicos'], ['Bloqueados', 'bloqueados'], ['Desbloqueados', 'desbloqueados'], ['Favoritos', 'favoritos']]), :onchange=>"filtrar_lista(this.value)", :style => 'width:200px') }"
+        ) do %>
+  <table class="parametros_edicao">
+  <tr>
+	<td>
+	<% if params[:view]=='arvore' %>
+    <%=ajuda_tag "Arraste e solte pelo ícone do seu relatório ou painel até o diretório escolhido"%>
+		<%= treeview_tag([GlbRelatorio, GlbPainelControle]) %>
+	<%else%>
+    <% lista_dados( :colunas => [{:estilo => 'width:40px'}, {:nome => 'Nome do relatório'}, {:nome => 'Tipo', :estilo => 'width:30%'}, {:nome => 'Visualização'}, {:nome => 'Análise'}, {:estilo => 'width:40px'}]) do -%>
+      <%
+		arr_relatorios = [@vLstRelatorio, (GlbRelatorio.carregar_por_cdg_usuario( usuario_logado.cdg_usuario, CDG_SISTEMA ))].flatten
+        arr_relatorios = arr_relatorios.sort_by{|x| x.respond_to?(:dsc_relatorio) ? x.dsc_relatorio.fonetica : x.nme_relatorio.fonetica }
+        arr_relatorios.each do |relatorio|
+        	if relatorio.is_a? EasyReport
+      %>
+        <tr class='todos fixos'>
+		  <td></td>
+          <td><a href="javascript:fnCarregarRelatorio(<%= relatorio.cdg_relatorio %>)"><%= relatorio.dsc_relatorio %></a></td>
+          <td><%= relatorio.dsc_tpo_relatorio %></td>
+          <td>Pública</td>
+          <td></td>
+          <td></td>
+        </tr>
+      <% else %>
+      	<% classe = "todos dinamicos "%>
+      	<% classe += "meus "	if relatorio.cdg_usuario_cad == usuario_logado.cdg_usuario %>
+      	<% classe += "bloqueados "	if relatorio.bloqueado? %>
+      	<% classe += "desbloqueados " if not relatorio.bloqueado? %>
+		<% classe += "favoritos " if relatorio.favorito?(usuario_logado.cdg_usuario) %>
+      	<tr class="<%=classe-%>">
+        	<td>
+          	<%= img_cadeado_tag(!relatorio.bloqueado?, :onclick => "alterar_sta_bloqueado(this, #{relatorio.cdg_relatorio});") if relatorio.permissao_para_bloquear?(usuario_logado) -%>
+			<%= img_favorito_tag(relatorio.favorito?(usuario_logado.cdg_usuario), :onclick => "alterar_favorito(this, #{relatorio.cdg_relatorio});", :title=>'Marque ou desmarque como favorito seus relatórios principais') -%>
+          </td>
+          <td><a href="<%= relatorio_path(relatorio) %>"><%= relatorio.nme_relatorio %></a></td>
+          <td><%= relatorio.dsc_tpo_relatorio %></td>
+          <td><%= relatorio.dsc_tpo_visualizacao %></td>
+          <td><%= relatorio.Analise.nme_analise %></td>
+          <td>
+            <% if usuario_logado.TemAcessoPermissaoAlterar?( :permissao => 'PMS_CAD_RELAT' ) %>
+              <%= image_tag('icones/edit.gif', :class => 'btnEditar', :alt=>'Editar', :onclick=>"top.location.href='/relatorios/#{relatorio.cdg_relatorio}/edit'") %>
+              <%= image_tag('icones/del.gif', :class => 'btnExcluir', :alt => 'Excluir', :onclick => "excluir_item_lista2('/relatorios/#{relatorio.cdg_relatorio}', function(){ top.location.reload(); }, true );") %>
+            <% end %>
+          </td>
+      </tr>
+     <%  end
+       end %>
+    <% end %>
+    </td>
+  </tr>
+	<%end%>
+  </table>
+<% end %>
+</form>
+<script>
+addEvent( window, 'load', function(){
+	//addEvent( $('tpo_filtro'), 'change',  );	
+	var op_filtro = ( Object.isUndefined(SIS.clsGlbSisSistema.PegarCookie('tpo_filtro')) || SIS.clsGlbSisSistema.PegarCookie('tpo_filtro')=='' ) ? 'todos' : SIS.clsGlbSisSistema.PegarCookie('tpo_filtro');
+	$('tpo_filtro').value = op_filtro;
+	filtrar_lista( op_filtro );
+});
+
+function filtrar_lista(p_valor){
+	var table = $('ResultadoCorpo');
+	SIS.clsGlbSisSistema.CriarCookie('tpo_filtro', p_valor );
+	if (table==null)
+		return false;
+	table.select('tr').each(function(i){i.hide()})
+	table.select('.'+p_valor).each(function(i){ i.show()});
+};
+function alterar_favorito(elem, id){
+	var url = "/relatorios/"+id+"/favorito";
+	requestAjax(url, '', function(transport){
+		window.location.reload();
+	/*
+		if (transport.responseText=='true')
+			elem.src = elem.src.sub('nao-favorito.png', 'favorito.png');
+		else
+			elem.src = elem.src.sub('favorito.png', 'nao-favorito.png');
+	*/
+	});
+};
+</script>
