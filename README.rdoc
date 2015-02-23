@@ -39,8 +39,8 @@ Load reports builded in JasperReport in RailsApp.
 
 === A bit more
 
-http://community.jaspersoft.com
-http://www.k19.com.br/artigos/relatorios-em-java-jasperreports-e-irepor/
+* http://community.jaspersoft.com
+* http://www.k19.com.br/artigos/relatorios-em-java-jasperreports-e-irepor/
 
 
 This project rocks and uses MIT-LICENSE.
