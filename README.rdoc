@@ -18,15 +18,14 @@ Load reports builded in JasperReport in RailsApp.
 2. [JasperReport] Build your design project and put the load files (.bak, .jasper, .jrxml) in RailsApp/app/reports
 
 3. [Rails] XML information: make file *.xml.builder in your views 
-<pre>
-# file app/views/people_list.xml.builder
-xml.instruct!(:xml)
-xml.person do
-  Person.all.each do |r|
-		xml << r.to_xml( :dasherize => false, :skip_instruct => true, :only => [:first_name, :last_ame, :age], :root => "person")
-  end
-end
-</pre>
+
+	# file app/views/people_list.xml.builder
+	xml.instruct!(:xml)
+	xml.person do
+	  Person.all.each do |r|
+	    xml << r.to_xml( :dasherize => false, :skip_instruct => true, :only => [:first_name, :last_ame, :age], :root => "person")
+	  end
+	end
 
 4. [Rails] Call, in your controller, the method *render_report* to render the report file
 <pre>
