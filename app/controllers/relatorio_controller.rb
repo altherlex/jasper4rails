@@ -136,7 +136,7 @@ class RelatorioController < ApplicationController
     end
   end
 
-  def render_report(template_file, xml_start_path, relatorio, nome_arquivo, output_type = 'pdf')
+  def render_report(template_file, xml_start_path, jasper_file, file_name_output, output_type = 'pdf')
     xml_contents = render_to_string(:template => template_file , :layout => false, :formats=>[:xml], :handlers=>[:builder])
 
     case output_type
@@ -155,8 +155,8 @@ class RelatorioController < ApplicationController
     end
 
     cache_hack
-    send_data( Jasper4rails::Report.load(xml_contents, relatorio, jasper_type, xml_start_path),
-      :filename => "#{nome_arquivo}.#{extensao}", :type => mime_type, :disposition => 'attachment')
+    send_data( Jasper4rails::Report.load(xml_contents, jasper_file, jasper_type, xml_start_path),
+      :filename => "#{file_name_output}.#{extensao}", :type => mime_type, :disposition => 'attachment')
   end
 end
    
