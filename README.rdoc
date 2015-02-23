@@ -29,7 +29,12 @@ Load reports builded in JasperReport in RailsApp.
 
 4- [Rails] Call, in your controller, the method *render_report* to render the report file
 
-  render_report('/relatorio/'+report.nme_relatorio, report.xml_path, report.nme_relatorio,"#{report.nme_relatorio}#{Time.now}", params[:pFormato] )
+  # Which parameters
+  render_report(template_file, xml_start_path, jasper_file, file_name_output, output_type = 'pdf')
+  # a case:
+  # invoke the view in '/relatorio/overview.xml.builder'
+  # invoke the design jasper in '/app/reports/overview.jasper'
+  render_report('/relatorio/overview', '/units', 'overview', "Overview#{Time.now}" )
 
 
 === A bit more
